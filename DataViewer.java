@@ -20,9 +20,9 @@ public class DataViewer extends JFrame
         top.add(topLabel);
 
         JPanel main = new JPanel();
-        StatsPanel statsPanel = new StatsPanel();
+        TablePanel tablePanel = new TablePanel();
 
-        main.add(statsPanel);
+        main.add(tablePanel);
 
         //ADD COMPONENTS TO THE GUI
         this.add(top, BorderLayout.NORTH);
