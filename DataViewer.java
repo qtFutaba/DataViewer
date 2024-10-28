@@ -28,10 +28,9 @@ public class DataViewer extends JFrame
         this.add(top, BorderLayout.NORTH);
         this.add(main, BorderLayout.CENTER);
 
-        //top.setBackground(new Color(208, 255, 249));
-        //main.setBackground(new Color(208, 255, 249));
+        //this.setBackground(new Color(40, 145, 255));
 
-        this.setSize(500,600);
+        this.setSize(900,700);
         this.setVisible(true);
     }
 
