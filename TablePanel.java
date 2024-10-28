@@ -137,7 +137,7 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         JPanel detailsDisplayPanel = new JPanel();
         detailsDisplayPanel.setLayout(new BoxLayout(detailsDisplayPanel, BoxLayout.Y_AXIS));
 
-        stateShowing = new JLabel("Details: NONE SELECTED");
+        stateShowing = new JLabel("None Selected");
         detailsPanel = new DetailsPanel();
 
 
@@ -235,6 +235,7 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
 
     public List<Double> calcData(List<Double> data)
     {
+        //
         double mean;
         double median;
         double standardDeviation;
@@ -286,17 +287,30 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
             stateShowing.setText(detaildata.getName());
 
             //SET VALUES FOR DATA
-            detailsPanel.setValue(String.valueOf(detaildata.getMurder()), 0);
-            detailsPanel.setValue(String.valueOf(detaildata.getAssault()), 1);
-            detailsPanel.setValue(String.valueOf(detaildata.getRape()), 2);
-            detailsPanel.setValue(String.valueOf(detaildata.getUrbanPop()), 3);
+            detailsPanel.setValue(String.valueOf(detaildata.getMurder()), 0); //MURDER
+            detailsPanel.setValue(String.valueOf(detaildata.getAssault()), 1); //ASSAULT
+            detailsPanel.setValue(String.valueOf(detaildata.getRape()), 2); //RAPE
+            detailsPanel.setValue(String.valueOf(detaildata.getUrbanPop()), 3); //URBAN POPULATION
 
             //SET VALUES FOR RANKING
 
-            //REPAINT
-            detailsPanel.revalidate();
-            detailsPanel.repaint();
         }
+        //NO STATE SELECTED - DEFAULT
+        else
+        {
+            stateShowing.setText("None Selected");
+
+            //SET VALUES FOR DATA
+            detailsPanel.setValue(String.valueOf(0), 0); //MURDER
+            detailsPanel.setValue(String.valueOf(0), 1); //ASSAULT
+            detailsPanel.setValue(String.valueOf(0), 2); //RAPE
+            detailsPanel.setValue(String.valueOf(0), 3); //URBAN POPULATION
+        }
+
+        //REPAINT
+        detailsPanel.revalidate();
+        detailsPanel.repaint();
+
     }
 
     @Override
@@ -351,7 +365,7 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
                         statesStream = statesStream.sorted(Comparator.comparing(StateData::getRape).reversed());
                     }
                 }
-                else if (Objects.equals(sortselection, "UrbanPop"))
+                else if (Objects.equals(sortselection, "% Of Urban Pop."))
                 {
                     if (Objects.equals(orderselection, "Ascending"))
                     {
