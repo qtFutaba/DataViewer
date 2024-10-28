@@ -55,9 +55,9 @@ public class ChartPanel extends JPanel
         double max = 0;
         for (StateData state : statesData)
         {
-            if (state.assault() > max)
+            if (state.getAssault() > max)
             {
-                max = state.assault();
+                max = state.getAssault();
             }
         }
 

@@ -15,34 +15,38 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public class TablePanel extends JPanel //implements ListSelectionListener, ActionListener, ItemListener
+public class TablePanel extends JPanel implements ListSelectionListener, ItemListener
 {
-    DefaultListModel stateList;
-    JList stateListDisplay;
-    List data;
-    Double[] means;
+    private DefaultListModel<StateData> stateList;
+    private JList stateListDisplay;
+    private List aggregateData;
+    private Double[] means;
 
-    JPanel sortPanel;
-    JPanel filterPanel;
-    JPanel listPanel;
+    private JPanel sortPanel;
+    private JPanel filterPanel;
+    private JPanel listPanel;
 
-    String sortType[] = {"Murder", "Assault", "Rape", "% Of Urban Pop."};
-    String orders[] = {"Ascending", "Descending"};
-    String greaterOrLesser[] = {"<", ">"};
+    private JLabel stateShowing;
 
-    JComboBox sortOptionDropDown1;
-    JComboBox sortOptionDropDown2;
-    JComboBox orderDropDown;
-    JComboBox greaterthanDropDown;
-    JSpinner filterNumberSpinner;
+    private String sortType[] = {"Murder", "Assault", "Rape", "% Of Urban Pop."};
+    private String orders[] = {"Ascending", "Descending"};
+    private String greaterOrLesser[] = {"<", ">"};
 
-    JCheckBox filterList;
-    JCheckBox sortList;
+    private JComboBox sortOptionDropDown1;
+    private JComboBox sortOptionDropDown2;
+    private JComboBox orderDropDown;
+    private JComboBox greaterthanDropDown;
+    private JSpinner filterNumberSpinner;
 
-    StatsPanel statsPanel;
-    ChartPanel chartPanel;
-    DetailsPanel detailsPanel;
+    private JCheckBox filterList;
+    private JCheckBox sortList;
+
+    private StatsPanel statsPanel;
+    private ChartPanel chartPanel;
+    private DetailsPanel detailsPanel;
 
     //DEFAULT CONSTRUCTOR
     public TablePanel()
@@ -57,14 +61,17 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
 
         JPanel sortLine1 = new JPanel();
         sortList = new JCheckBox("Sort");
+        sortList.addItemListener(this);
         sortLine1.add(sortList);
 
         JPanel sortLine2 = new JPanel();
         sortOptionDropDown1 = new JComboBox(sortType);
+        sortOptionDropDown1.addItemListener(this);
         sortLine2.add(sortOptionDropDown1);
 
         JPanel sortLine3 = new JPanel();
         orderDropDown = new JComboBox(orders);
+        orderDropDown.addItemListener(this);
         sortLine3.add(orderDropDown);
 
         sortPanel.add(sortLine1);
@@ -79,11 +86,15 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
 
         JPanel filterLine1 = new JPanel();
         filterList = new JCheckBox("Filter");
+        filterList.addItemListener(this);
+
         filterLine1.add(filterList);
 
         JPanel filterLine2 = new JPanel();
         sortOptionDropDown2 = new JComboBox(sortType);
+        sortOptionDropDown2.addItemListener(this);
         greaterthanDropDown = new JComboBox(greaterOrLesser);
+        greaterthanDropDown.addItemListener(this);
         filterNumberSpinner = new JSpinner();
 
         filterLine2.add(sortOptionDropDown2);
@@ -104,10 +115,11 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
         readData();
 
         stateListDisplay = new JList(stateList);
+        stateListDisplay.addListSelectionListener(this);
+
         JScrollPane stateListScroller = new JScrollPane(stateListDisplay);
 
         statePanel.add(new JScrollPane(stateListScroller));
-
 
 
         //-----------------------------------------------------------------------------
@@ -115,9 +127,9 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
         //-----------------------------------------------------------------------------
         statsPanel = new StatsPanel();
 
-        data = List.of(stateList.toArray());
+        aggregateData = List.of(stateList.toArray());
 
-        updateStatsData(data);
+        updateStatsData(aggregateData);
 
         //-----------------------------------------------------------------------------
         //SPECIFIC DETAILS PANEL
@@ -125,17 +137,18 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
         JPanel detailsDisplayPanel = new JPanel();
         detailsDisplayPanel.setLayout(new BoxLayout(detailsDisplayPanel, BoxLayout.Y_AXIS));
 
-        JLabel detailsLabel = new JLabel("Details: NONE SELECTED");
+        stateShowing = new JLabel("Details: NONE SELECTED");
         detailsPanel = new DetailsPanel();
 
 
-        detailsDisplayPanel.add(detailsLabel);
+        detailsDisplayPanel.add(stateShowing);
         detailsDisplayPanel.add(detailsPanel);
 
         //-----------------------------------------------------------------------------
         //CHART PANEL
         //-----------------------------------------------------------------------------
-        chartPanel = new ChartPanel(data, means);
+        chartPanel = new ChartPanel(aggregateData, means);
+
         //-----------------------------------------------------------------------------
         //ADD ALL TO TABLEPANEL
         //-----------------------------------------------------------------------------
@@ -164,7 +177,7 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
 
                 StateData newState = new StateData(values[0],Double.parseDouble(values[1]),Double.parseDouble(values[2]),Double.parseDouble(values[3]),Double.parseDouble(values[4]));
 
-                //ADD TO CITY INFO LIST
+                //ADD TO STATE INFO LIST
                 stateList.addElement(newState);
             }
         }
@@ -185,10 +198,10 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
 
         for (StateData state : data)
         {
-            murder.add(state.murder());
-            assault.add(state.assault());
-            rape.add(state.rape());
-            urbanPop.add(state.urbanPop());
+            murder.add(state.getMurder());
+            assault.add(state.getAssault());
+            rape.add(state.getRape());
+            urbanPop.add(state.getUrbanPop());
         }
 
         List<Double> statistics = new ArrayList<>();
@@ -260,7 +273,169 @@ public class TablePanel extends JPanel //implements ListSelectionListener, Actio
         result.add(truncatedSTD);
 
         return result;
+    }
 
+    @Override
+    public void valueChanged(ListSelectionEvent e)
+    {
+        //SELECTED STATE - TAKE DATA FROM LIST
+        if (stateListDisplay.isSelectionEmpty() == false) {
+            StateData detaildata = stateList.getElementAt(stateListDisplay.getSelectedIndex());
+
+
+            stateShowing.setText(detaildata.getName());
+
+            //SET VALUES FOR DATA
+            detailsPanel.setValue(String.valueOf(detaildata.getMurder()), 0);
+            detailsPanel.setValue(String.valueOf(detaildata.getAssault()), 1);
+            detailsPanel.setValue(String.valueOf(detaildata.getRape()), 2);
+            detailsPanel.setValue(String.valueOf(detaildata.getUrbanPop()), 3);
+
+            //SET VALUES FOR RANKING
+
+            //REPAINT
+            detailsPanel.revalidate();
+            detailsPanel.repaint();
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e)
+    {
+        //SORT THE DATA
+        if (e.getSource().equals(sortList))
+        {
+            stateListDisplay.clearSelection();
+
+
+            if (sortList.isSelected())
+            {
+                sortOptionDropDown1.setEnabled(false);
+                orderDropDown.setEnabled(false);
+
+                String sortselection = (String) sortOptionDropDown1.getSelectedItem();
+                String orderselection = (String) orderDropDown.getSelectedItem();
+
+                Stream statesStream = Arrays.stream(stateList.toArray());
+
+                if (Objects.equals(sortselection, "Murder"))
+                {
+                    if (Objects.equals(orderselection, "Ascending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getMurder));
+                    }
+                    else if (Objects.equals(orderselection, "Descending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getMurder).reversed());
+                    }
+                }
+                else if (Objects.equals(sortselection, "Assault"))
+                {
+                    if (Objects.equals(orderselection, "Ascending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getAssault));
+                    }
+                    else if (Objects.equals(orderselection, "Descending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getAssault).reversed());
+                    }
+                }
+                else if (Objects.equals(sortselection, "Rape"))
+                {
+                    if (Objects.equals(orderselection, "Ascending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getRape));
+                    }
+                    else if (Objects.equals(orderselection, "Descending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getRape).reversed());
+                    }
+                }
+                else if (Objects.equals(sortselection, "UrbanPop"))
+                {
+                    if (Objects.equals(orderselection, "Ascending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getUrbanPop));
+                    }
+                    else if (Objects.equals(orderselection, "Descending"))
+                    {
+                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getUrbanPop).reversed());
+                    }
+                }
+
+                stateList.clear();
+                for (Object state : statesStream.toList())
+                {
+                    StateData stateData = (StateData) state;
+                    stateList.addElement(stateData);
+                }
+            }
+            else
+            {
+                sortOptionDropDown1.setEnabled(true);
+                orderDropDown.setEnabled(true);
+                stateList.clear();
+                readData();
+            }
+        };
+
+        if (e.getSource().equals(filterList))
+        {
+            stateListDisplay.clearSelection();
+            sortOptionDropDown2.setEnabled(false);
+            greaterthanDropDown.setEnabled(false);
+            filterNumberSpinner.setEnabled(false);
+
+            if (filterList.isSelected())
+            {
+                String filterselection = (String) sortOptionDropDown2.getSelectedItem();
+                String greaterselection = (String) greaterthanDropDown.getSelectedItem();
+                double comparatorFilter = (double) filterNumberSpinner.getValue();
+
+                Stream statesStream = Arrays.stream(stateList.toArray());
+
+                if (Objects.equals(filterselection, "Murder")) {
+                    Predicate<StateData> filterPredicate;
+
+                    if (greaterselection.equals(">")) {
+                        filterPredicate = new Predicate<StateData>() {
+                            @Override
+                            public boolean test(StateData state) {
+                                return state.getMurder() > comparatorFilter;
+                            }
+                        };
+                    } else if (greaterselection.equals("<")) {
+                        filterPredicate = new Predicate<StateData>() {
+                            @Override
+                            public boolean test(StateData state) {
+                                return state.getMurder() < comparatorFilter;
+                            }
+                        };
+                    } else {
+                        // In case of an unrecognized selection, return early or handle it
+                        filterPredicate = state -> true; // No filter applied if none is specified
+                    }
+
+                    // Apply the predicate as a filter
+                    statesStream = statesStream.filter(filterPredicate);
+                }
+
+                stateList.clear();
+                for (Object state : statesStream.toList())
+                {
+                    StateData stateData = (StateData) state;
+                    stateList.addElement(stateData);
+                }
+            }
+            else
+            {
+                sortOptionDropDown2.setEnabled(true);
+                greaterthanDropDown.setEnabled(true);
+                filterNumberSpinner.setEnabled(true);
+                stateList.clear();
+                readData();
+            }
+        };
     }
 }
 
