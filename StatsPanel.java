@@ -68,6 +68,9 @@ public class StatsPanel extends JPanel
         this.add(values[11]); //URBAN POP. STANDARD DEVIATION
 
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        //COLOR :)
+        this.setBackground(Color.WHITE);
     }
 
     public void setValue(String value, int index)

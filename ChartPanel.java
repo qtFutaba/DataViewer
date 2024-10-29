@@ -29,8 +29,6 @@ public class ChartPanel extends JPanel
 
         //CREATE THE PANEL.
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-        JPanel panel = new JPanel();
-        this.add(panel);
     }
 
     public ChartPanel(List<StateData> data, Double[] means)
@@ -41,8 +39,6 @@ public class ChartPanel extends JPanel
 
         //CREATE THE PANEL.
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-        JPanel panel = new JPanel();
-        this.add(panel);
     }
 
     @Override
@@ -72,6 +68,7 @@ public class ChartPanel extends JPanel
         for (int i = 0; i < 4; i++)
         {
             //LABEL THE BAR
+            g.setColor(Color.BLACK);
             g.drawString(labels[i], x, y);
 
             //MAXIMUM BAR HEIGHT = 250
@@ -80,8 +77,10 @@ public class ChartPanel extends JPanel
 
             //RECTANGLE BEGINS AT UPPER LEFT CORNER, START ABOVE THE LABEL AT THE HEIGHT OF THE BAR
             //WIDTH STAYS AT 30.
-            g.drawRect(x+3,y-height-15, 30, height);
+            g.setColor(Color.WHITE);
+            g.fill3DRect(x+3,y-height-15, 30, height, true);
 
+            g.setColor(Color.BLACK);
             //DISPLAY THE VALUE OF THE BAR ABOVE THE BAR.
             g.drawString(String.valueOf(means[i]), x+2, y-height-20);
 

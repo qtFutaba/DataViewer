@@ -45,6 +45,9 @@ public class DetailsPanel extends JPanel
         this.add(values[3]); //STATE URBAN POPULATION PERCENTAGE
 
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        //COLOR :)
+        this.setBackground(Color.WHITE);
     }
 
     public void setValue(String value, int index)

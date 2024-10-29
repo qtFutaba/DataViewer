@@ -83,6 +83,10 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         sortPanel.add(sortLine2);
         sortPanel.add(sortLine3);
 
+        sortLine1.setBackground(new Color(40, 145, 255));
+        sortLine2.setBackground(new Color(40, 145, 255));
+        sortLine3.setBackground(new Color(40, 145, 255));
+
         sortPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         sortPanel.setPreferredSize(new Dimension(300,120));
 
@@ -113,11 +117,21 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         filterPanel.add(filterLine1);
         filterPanel.add(filterLine2);
 
+        filterLine1.setBackground(new Color(40, 145, 255));
+        filterLine2.setBackground(new Color(40, 145, 255));
+
+
         filterPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         filterPanel.setPreferredSize(new Dimension(300,120));
 
         controlsPanel.add(sortPanel);
         controlsPanel.add(filterPanel);
+
+        sortPanel.setBackground(new Color(40, 145, 255));
+        filterPanel.setBackground(new Color(40, 145, 255));
+        controlsPanel.setBackground(new Color(40, 145, 255));
+
+
 
         //-----------------------------------------------------------------------------
         //TABLE OF STATES
@@ -154,6 +168,8 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
 
         statsDisplayPanel.add(statsLabel);
         statsDisplayPanel.add(statsPanel);
+        statsDisplayPanel.setBackground(new Color(40, 145, 255));
+        statsPanel.setBackground(Color.WHITE);
 
         //-----------------------------------------------------------------------------
         //SPECIFIC DETAILS PANEL
@@ -167,6 +183,8 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
 
         detailsDisplayPanel.add(stateShowing);
         detailsDisplayPanel.add(detailsPanel);
+        detailsDisplayPanel.setBackground(new Color(40, 145, 255));
+        detailsPanel.setBackground(Color.WHITE);
 
         //-----------------------------------------------------------------------------
         //CHART PANEL
@@ -183,7 +201,14 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         this.add(detailsDisplayPanel);
         this.add(chartPanel);
 
-        setBackground(new Color(40, 145, 255));
+        //COLOR :)
+        this.setBackground(new Color(40, 145, 255));
+        controlsPanel.setBackground(new Color(40, 145, 255));
+        statsDisplayPanel.setBackground(new Color(40, 145, 255));
+        chartPanel.setBackground(new Color(40, 145, 255));
+
+        sortList.setBackground(new Color(40, 145, 255));
+        filterList.setBackground(new Color(40, 145, 255));
     }
 
     public void readData()
