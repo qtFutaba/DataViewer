@@ -13,28 +13,29 @@ import java.util.*;
 public class DetailsPanel extends JPanel
 {
     JLabel[] labels;
-    String[] labelStrings = {"Arrests Per 10,000 Residents: ","Rank amongst states:"};
+    String[] labelStrings = {"Arrests Per 10,000 Residents: "};
 
     JLabel[] values;
 
     //DEFAULT CONSTRUCTOR
     public DetailsPanel()
     {
-        labels = new JLabel[2];
+        labels = new JLabel[1];
         values = new JLabel[8];
 
-
+        //INITIALIZE THE LABELS.
         for (int i = 0; i < labels.length; i++)
         {
             labels[i] = new JLabel(labelStrings[i]);
         }
 
+        //INITIALIZE THE VALUES.
         for (int i = 0; i < values.length; i++)
         {
             values[i] = new JLabel("0");
         }
 
-        this.setLayout(new GridLayout(2, 5));
+        this.setLayout(new GridLayout(1, 5));
 
         //FIRST ROW: ARRESTS
         this.add(labels[0]);
@@ -43,14 +44,7 @@ public class DetailsPanel extends JPanel
         this.add(values[2]); //STATE RAPE RATE
         this.add(values[3]); //STATE URBAN POPULATION PERCENTAGE
 
-        //SECOND ROW: RANKINGS
-        this.add(labels[1]);
-        this.add(values[4]); //MURDER MEAN
-        this.add(values[5]); //ASSAULT MEAN
-        this.add(values[6]); //RAPE MEAN
-        this.add(values[7]); //URBAN POP MEAN
-
-        this.setBackground(Color.WHITE);
+        this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     public void setValue(String value, int index)

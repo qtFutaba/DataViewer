@@ -14,44 +14,51 @@ import java.util.Map;
 
 public class ChartPanel extends JPanel
 {
+    final int PANEL_WIDTH = 400;
+    final int PANEL_HEIGHT = 400;
+    final int VARIABLES = 4;
+
     List<StateData> statesData;
     Double [] means;
 
     public ChartPanel()
     {
+        //INITIALIZE DATA BECAUSE NULL IS BAD USUALLY.
         statesData = new ArrayList<StateData>();
-        means = new Double[4];
+        means = new Double[VARIABLES];
 
-        setPreferredSize(new Dimension(300, 400));
-
+        //CREATE THE PANEL.
+        setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         JPanel panel = new JPanel();
-
         this.add(panel);
     }
 
     public ChartPanel(List<StateData> data, Double[] means)
     {
+        //STORE DATA TO USE FOR CHART MAKING.
         statesData = data;
         this.means = means;
 
-        setPreferredSize(new Dimension(800, 400));
-
+        //CREATE THE PANEL.
+        setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         JPanel panel = new JPanel();
-
         this.add(panel);
-
     }
 
     @Override
+    //DRAWING GRAPHICS
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
+        //WHAT IT SAYS ON THE TIN: LABELS FOR THE CHART.
         String[] labels = {"Murder", "Assault", "Rape", "% Urban Pop."};
 
+        //INITIALIZE OUR X AND Y COORDINATES FOR THE CHART
         int x = 300;
         int y = 180;
 
+        //FIND THE MAXIMUM VALUE FOR THE STATISTICAL VALUES
         double max = 0;
         for (StateData state : statesData)
         {
@@ -61,19 +68,24 @@ public class ChartPanel extends JPanel
             }
         }
 
+        //FOR EACH VARIABLE, CREATE A BAR
         for (int i = 0; i < 4; i++)
         {
+            //LABEL THE BAR
             g.drawString(labels[i], x, y);
 
             //MAXIMUM BAR HEIGHT = 250
             double heightPercentage = means[i]/max;
             int height = (int) (heightPercentage*250);
 
+            //RECTANGLE BEGINS AT UPPER LEFT CORNER, START ABOVE THE LABEL AT THE HEIGHT OF THE BAR
+            //WIDTH STAYS AT 30.
             g.drawRect(x+3,y-height-15, 30, height);
+
+            //DISPLAY THE VALUE OF THE BAR ABOVE THE BAR.
             g.drawString(String.valueOf(means[i]), x+2, y-height-20);
 
-
-
+            //CREATE DISTANCE BETWEEN THE BARS.
             x += 50;
         }
     }

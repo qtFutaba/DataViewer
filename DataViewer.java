@@ -3,22 +3,23 @@ import java.awt.*;
 
 public class DataViewer extends JFrame
 {
+    final int PANEL_WIDTH = 900;
+    final int PANEL_HEIGHT = 700;
+
     public DataViewer()
     {
         //OPEN THE FRAME
         this.setTitle("Data Viewer");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //TOP OF GUI
-        JLabel statusLabel = new JLabel("Status: ", JLabel.CENTER);
-
-        JLabel topLabel = new JLabel("US Violent Crime Data Viewer",10);
-        //topLabel.setFont(new Font("Rockwell",Font.BOLD,18));
-
+        //TOP OF GUI (HEADER)
+        JLabel topLabel = new JLabel("U.S. Violent Crime Data Viewer",10);
+        topLabel.setFont(new Font("Stencil",Font.BOLD,18));
 
         JPanel top = new JPanel();
         top.add(topLabel);
 
+        //MAIN PART OF THE GUI
         JPanel main = new JPanel();
         TablePanel tablePanel = new TablePanel();
 
@@ -30,10 +31,12 @@ public class DataViewer extends JFrame
 
         //this.setBackground(new Color(40, 145, 255));
 
-        this.setSize(900,700);
+        //FINALIZE SIZE AND DISPLAY
+        this.setSize(PANEL_WIDTH,PANEL_HEIGHT);
         this.setVisible(true);
     }
 
+    //START THE PROGRAM
     public static void main(String[] args)
     {
         DataViewer dataViewer = new DataViewer();

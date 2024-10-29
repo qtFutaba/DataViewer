@@ -23,11 +23,13 @@ public class StatsPanel extends JPanel
         labels = new JLabel[8];
         values = new JLabel[12];
 
+        //INITIALIZE THE LABELS.
         for (int i = 0; i < labels.length; i++)
         {
             labels[i] = new JLabel(labelStrings[i]);
         }
 
+        //INITIALIZE THE VALUES.
         for (int i = 0; i < values.length; i++)
         {
             values[i] = new JLabel("0");
@@ -65,7 +67,7 @@ public class StatsPanel extends JPanel
         this.add(values[10]); //RAPE STANDARD DEVIATION
         this.add(values[11]); //URBAN POP. STANDARD DEVIATION
 
-        this.setBackground(Color.WHITE);
+        this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     public void setValue(String value, int index)
