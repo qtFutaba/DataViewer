@@ -15,13 +15,13 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 //THE TABLE PANEL: HEART OF THE GUI. CONTAINS THE SORTING AND FILTERING INTERFACES, THE AGGREGATE STAT VIEW, THE TABLE OF VARIABLES, DETAILS, AND CHART.
-public class TablePanel extends JPanel implements ListSelectionListener, ItemListener
+public class TablePanel extends JPanel
 {
     //LISTS OF VARIABLES
-    private DefaultListModel<StateData> stateList;
-    private JList stateListDisplay;
-    private List data;
-    private Double[] means;
+    DefaultListModel<StateData> stateList;
+    JList stateListDisplay;
+    List data;
+    Double[] means;
 
     //MAIN PANELS FOR LAYOUT
     private JPanel controlsPanel;
@@ -30,7 +30,7 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
     private JPanel listPanel;
 
     //LABEL FOR STATE DETAIL PANEL
-    private JLabel stateShowing;
+    JLabel stateShowing;
 
     //DROP DOWN BOXES LABELS
     private String sortType[] = {"Murder", "Assault", "Rape", "% Of Urban Pop."};
@@ -38,24 +38,28 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
     private String greaterOrLesser[] = {"<", ">"};
 
     //CONTROLS
-    private JComboBox sortOptionDropDown1;
-    private JComboBox sortOptionDropDown2;
-    private JComboBox orderDropDown;
-    private JComboBox greaterthanDropDown;
-    private JSpinner filterNumberSpinner;
+    JComboBox sortOptionDropDown1;
+    JComboBox sortOptionDropDown2;
+    JComboBox orderDropDown;
+    JComboBox greaterthanDropDown;
+    JSpinner filterNumberSpinner;
 
-    private JCheckBox filterList;
-    private JCheckBox sortList;
+    JCheckBox filterList;
+    JCheckBox sortList;
 
     //SPECIFIC PANELS
     private StatsPanel statsPanel;
-    private ChartPanel chartPanel;
-    private DetailsPanel detailsPanel;
+    ChartPanel chartPanel;
+    DetailsPanel detailsPanel;
+
+    //OBSERVER
+    DataController dc;
 
     //DEFAULT CONSTRUCTOR
     public TablePanel()
     {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        dc = new DataController(this);
 
         controlsPanel = new JPanel();
         //-----------------------------------------------------------------------------
@@ -66,17 +70,17 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
 
         JPanel sortLine1 = new JPanel();
         sortList = new JCheckBox("Sort");
-        sortList.addItemListener(this);
+        sortList.addItemListener(dc);
         sortLine1.add(sortList);
 
         JPanel sortLine2 = new JPanel();
         sortOptionDropDown1 = new JComboBox(sortType);
-        sortOptionDropDown1.addItemListener(this);
+        sortOptionDropDown1.addItemListener(dc);
         sortLine2.add(sortOptionDropDown1);
 
         JPanel sortLine3 = new JPanel();
         orderDropDown = new JComboBox(orders);
-        orderDropDown.addItemListener(this);
+        orderDropDown.addItemListener(dc);
         sortLine3.add(orderDropDown);
 
         sortPanel.add(sortLine1);
@@ -98,15 +102,15 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
 
         JPanel filterLine1 = new JPanel();
         filterList = new JCheckBox("Filter");
-        filterList.addItemListener(this);
+        filterList.addItemListener(dc);
 
         filterLine1.add(filterList);
 
         JPanel filterLine2 = new JPanel();
         sortOptionDropDown2 = new JComboBox(sortType);
-        sortOptionDropDown2.addItemListener(this);
+        sortOptionDropDown2.addItemListener(dc);
         greaterthanDropDown = new JComboBox(greaterOrLesser);
-        greaterthanDropDown.addItemListener(this);
+        greaterthanDropDown.addItemListener(dc);
         filterNumberSpinner = new JSpinner();
         filterNumberSpinner.setPreferredSize(new Dimension(50,26));
 
@@ -144,7 +148,7 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         readData();
 
         stateListDisplay = new JList(stateList);
-        stateListDisplay.addListSelectionListener(this);
+        stateListDisplay.addListSelectionListener(dc);
 
         JScrollPane stateListScroller = new JScrollPane(stateListDisplay);
 
@@ -341,235 +345,6 @@ public class TablePanel extends JPanel implements ListSelectionListener, ItemLis
         result.add(truncatedSTD);
 
         return result;
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e)
-    {
-        //SELECTED STATE - TAKE DATA FROM LIST
-        if (stateListDisplay.isSelectionEmpty() == false) {
-            StateData detaildata = stateList.getElementAt(stateListDisplay.getSelectedIndex());
-
-
-            stateShowing.setText(detaildata.getName());
-
-            //SET VALUES FOR DATA
-            detailsPanel.setValue(String.valueOf(detaildata.getMurder()), 0); //MURDER
-            detailsPanel.setValue(String.valueOf(detaildata.getAssault()), 1); //ASSAULT
-            detailsPanel.setValue(String.valueOf(detaildata.getRape()), 2); //RAPE
-            detailsPanel.setValue(String.valueOf(detaildata.getUrbanPop()), 3); //URBAN POPULATION
-
-        }
-        //NO STATE SELECTED - DEFAULT
-        else
-        {
-            stateShowing.setText("No State Selected");
-
-            //SET VALUES FOR DATA
-            detailsPanel.setValue(String.valueOf(0), 0); //MURDER
-            detailsPanel.setValue(String.valueOf(0), 1); //ASSAULT
-            detailsPanel.setValue(String.valueOf(0), 2); //RAPE
-            detailsPanel.setValue(String.valueOf(0), 3); //URBAN POPULATION
-        }
-
-        //REPAINT
-        detailsPanel.revalidate();
-        detailsPanel.repaint();
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e)
-    {
-        //SORT THE DATA
-        if (e.getSource().equals(sortList))
-        {
-            //CLEAR LIST SELECTION TO AVOID WEIRD ISSUES WITH THE SHOWN DETAILS PANEL
-            stateListDisplay.clearSelection();
-
-            //SORTING ACTIVE
-            if (sortList.isSelected())
-            {
-                sortOptionDropDown1.setEnabled(false);
-                orderDropDown.setEnabled(false);
-
-                String sortselection = (String) sortOptionDropDown1.getSelectedItem();
-                String orderselection = (String) orderDropDown.getSelectedItem();
-
-                Stream statesStream = Arrays.stream(stateList.toArray());
-
-                if (Objects.equals(sortselection, "Murder"))
-                {
-                    if (Objects.equals(orderselection, "Ascending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getMurder));
-                    }
-                    else if (Objects.equals(orderselection, "Descending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getMurder).reversed());
-                    }
-                }
-                else if (Objects.equals(sortselection, "Assault"))
-                {
-                    if (Objects.equals(orderselection, "Ascending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getAssault));
-                    }
-                    else if (Objects.equals(orderselection, "Descending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getAssault).reversed());
-                    }
-                }
-                else if (Objects.equals(sortselection, "Rape"))
-                {
-                    if (Objects.equals(orderselection, "Ascending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getRape));
-                    }
-                    else if (Objects.equals(orderselection, "Descending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getRape).reversed());
-                    }
-                }
-                else if (Objects.equals(sortselection, "% Of Urban Pop."))
-                {
-                    if (Objects.equals(orderselection, "Ascending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getUrbanPop));
-                    }
-                    else if (Objects.equals(orderselection, "Descending"))
-                    {
-                        statesStream = statesStream.sorted(Comparator.comparing(StateData::getUrbanPop).reversed());
-                    }
-                }
-
-                stateList.clear();
-                for (Object state : statesStream.toList())
-                {
-                    StateData stateData = (StateData) state;
-                    stateList.addElement(stateData);
-                }
-            }
-            //SORTING INACTIVE - RETURN TO DEFAULT
-            else
-            {
-                //RESET CONTROLS
-                sortOptionDropDown1.setEnabled(true);
-                orderDropDown.setEnabled(true);
-                stateList.clear();
-                readData();
-            }
-        }
-
-        //FILTER THE DATA
-        else if (e.getSource().equals(filterList))
-        {
-            //CLEAR LIST SELECTION TO AVOID WEIRD ISSUES WITH THE SHOWN DETAILS PANEL
-            stateListDisplay.clearSelection();
-
-            //FILTER ACTIVE
-            if (filterList.isSelected())
-            {
-                sortOptionDropDown2.setEnabled(false);
-                greaterthanDropDown.setEnabled(false);
-                filterNumberSpinner.setEnabled(false);
-
-                String filterselection = (String) sortOptionDropDown2.getSelectedItem();
-                String directionselection = (String) greaterthanDropDown.getSelectedItem();
-                int filterComparator = (int) filterNumberSpinner.getValue();
-
-                //USING STREAMS
-                Stream statesStream = Arrays.stream(stateList.toArray());
-
-                //SETUP FILTER FOR COMPARISON OF > OR <
-                Predicate<StateData> filterPredicate = null;
-
-                if (Objects.equals(filterselection, "Murder"))
-                {
-                    if (Objects.equals(directionselection, ">"))
-                    {
-                        filterPredicate = state -> state.getMurder() > filterComparator;
-                    }
-                    else if (Objects.equals(directionselection, "<"))
-                    {
-                        filterPredicate = state -> state.getMurder() < filterComparator;
-                    }
-                }
-                else if (Objects.equals(filterselection, "Assault"))
-                {
-                    if (Objects.equals(directionselection, ">"))
-                    {
-                        filterPredicate = state -> state.getAssault() > filterComparator;
-                    }
-                    else if (Objects.equals(directionselection, "<"))
-                    {
-                        filterPredicate = state -> state.getAssault() < filterComparator;
-                    }
-                }
-                else if (Objects.equals(filterselection, "Rape"))
-                {
-                    if (Objects.equals(directionselection, ">"))
-                    {
-                        filterPredicate = state -> state.getRape() > filterComparator;
-                    }
-                    else if (Objects.equals(directionselection, "<"))
-                    {
-                        filterPredicate = state -> state.getRape() < filterComparator;
-                    }
-                }
-                else if (Objects.equals(filterselection, "% Of Urban Pop."))
-                {
-                    if (Objects.equals(directionselection, ">"))
-                    {
-                        filterPredicate = state -> state.getUrbanPop() > filterComparator;
-                    }
-                    else if (Objects.equals(directionselection, "<"))
-                    {
-                        filterPredicate = state -> state.getUrbanPop() < filterComparator;
-                    }
-                }
-
-                //APPLY FILTER
-                statesStream = statesStream.filter(filterPredicate);
-
-                //CLEAR LIST TO ALLOW FOR FILTERED LIST
-                stateList.clear();
-
-                //ADD FILTERED STREAM LIST TO DISPLAY LIST
-                for (Object state : statesStream.toList())
-                {
-                    StateData stateData = (StateData) state;
-                    stateList.addElement(stateData);
-                }
-
-                //UPDATE AGGREGATE DATA WITH FILTERS
-                data = List.of(stateList.toArray());
-                updateStatsData(data);
-
-                //RESET CHART
-                this.remove(chartPanel);
-                chartPanel = new ChartPanel(data, means);
-                this.add(chartPanel);
-            }
-            //FILTER INACTIVE - RETURN TO DEFAULT
-            else
-            {
-                //RESET CONTROLS
-                sortOptionDropDown2.setEnabled(true);
-                greaterthanDropDown.setEnabled(true);
-                filterNumberSpinner.setEnabled(true);
-                stateList.clear();
-                readData();
-
-                //MUST UPDATE THE AGGREGATE DATA TO DEFAULT
-                data = List.of(stateList.toArray());
-                updateStatsData(data);
-
-                //RESET CHART
-                this.remove(chartPanel);
-                chartPanel = new ChartPanel(data, means);
-                this.add(chartPanel);
-            }
-        }
     }
 }
 

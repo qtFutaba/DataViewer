@@ -23,6 +23,8 @@ public class DataViewer extends JFrame
         JPanel main = new JPanel();
         TablePanel tablePanel = new TablePanel();
 
+
+
         main.add(tablePanel);
 
         //ADD COMPONENTS TO THE GUI

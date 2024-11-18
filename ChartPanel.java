@@ -28,6 +28,7 @@ public class ChartPanel extends JPanel
         means = new Double[VARIABLES];
 
         //CREATE THE PANEL.
+        setBackground(new Color(40, 145, 255));
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
     }
 
@@ -38,6 +39,7 @@ public class ChartPanel extends JPanel
         this.means = means;
 
         //CREATE THE PANEL.
+        setBackground(new Color(40, 145, 255));
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
     }
 
@@ -46,6 +48,7 @@ public class ChartPanel extends JPanel
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+        setBackground(new Color(40, 145, 255));
 
         //WHAT IT SAYS ON THE TIN: LABELS FOR THE CHART.
         String[] labels = {"Murder", "Assault", "Rape", "% Urban Pop."};
